@@ -38,3 +38,26 @@ select nt.*, Persisted, Retained
 FROM NewTransfers nt 
 	LEFT JOIN persistence p ON nt.ID_NUM=p.ID_NUM AND nt.Seq_Num=p.Seq_Num
 	LEFT JOIN retention r ON nt.ID_NUM=r.ID_NUM AND nt.Seq_Num=r.Seq_Num
+
+/*PowerBI Measures:
+
+Dynamic measures change values based on the filter for the page/visual. 
+Overall measures are not affected by filters.
+
+DynamicPersist = DIVIDE(
+    COUNTROWS(FILTER(RandP_Values, RandP_Values[Persisted]="Yes")), --NUMERATOR(COUNT OF ROWS WHERE PERSISTED IS YES)
+    COUNT(RandP_Values[Persisted])) --DENOMINATOR(COUNT OF ALL ROWS WITH NON-BLANK VALUES)
+DynamicRetain = DIVIDE(
+    COUNTROWS(FILTER(RandP_Values, RandP_Values[Retained]="Yes")), --NUMERATOR(COUNT OF ROWS WHERE PERSISTED IS YES)
+    COUNT(RandP_Values[Retained])) --DENOMINATOR(COUNT OF ALL ROWS WITH NON-BLANK VALUES)
+
+OverallPersist = DIVIDE(
+    CALCULATE(COUNTROWS(FILTER(RandP_Values, RandP_Values[Persisted]="Yes")), RandP_Values[MAJOR_1] in ALLSELECTED(RandP_Values[MAJOR_1])), --NUMERATOR(COUNT OF ALL ROWS WITH PERSIST OF YES)
+    CALCULATE(COUNT(RandP_Values[Persisted]),RandP_Values[MAJOR_1] in ALLSELECTED(RandP_Values[MAJOR_1])) --DENOMINATOR(COUNT OF ALL ROWS WITH A NON-BLANK VALUE FOR PERSIST)
+    ) --IN ALL SELECTED HERE IGNORES THE MAJOR_1 FILTER ON WHATEVER VISUAL THIS MEASURE IS USED IN
+OverallRetain = DIVIDE(
+    CALCULATE(COUNTROWS(FILTER(RandP_Values, RandP_Values[Retained]="Yes")), RandP_Values[MAJOR_1] in ALLSELECTED(RandP_Values[MAJOR_1])), --NUMERATOR(COUNT OF ALL ROWS WITH PERSIST OF YES)
+    CALCULATE(COUNT(RandP_Values[Retained]),RandP_Values[MAJOR_1] in ALLSELECTED(RandP_Values[MAJOR_1])) --DENOMINATOR(COUNT OF ALL ROWS WITH A NON-BLANK VALUE FOR PERSIST)
+    ) --IN ALL SELECTED HERE IGNORES THE MAJOR_1 FILTER ON WHATEVER VISUAL THIS MEASURE IS USED IN
+
+*/
